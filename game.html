@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tic Tac Toe</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 36px;
+            font-family: Arial, sans-serif;
+            cursor: pointer;
+            border: 2px solid #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="board" id="board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+    <script>
+        const board = document.getElementById('board');
+        const cells = document.querySelectorAll('.cell');
+        let currentPlayer = 'X';
+        const winningCombinations = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        cells.forEach(cell => {
+            cell.addEventListener('click', handleCellClick);
+        });
+
+        function handleCellClick(event) {
+            const cell = event.target;
+            const index = cell.dataset.index;
+
+            if (cell.textContent !== '') return;
+
+            cell.textContent = currentPlayer;
+            if (checkWin(currentPlayer)) {
+                setTimeout(() => alert(currentPlayer + ' wins!'), 100);
+                resetBoard();
+            } else if (isDraw()) {
+                setTimeout(() => alert('Draw!'), 100);
+                resetBoard();
+            } else {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                if (currentPlayer === 'O') {
+                    botMove();
+                }
+            }
+        }
+
+        function botMove() {
+            let availableCells = [];
+            cells.forEach((cell, index) => {
+                if (cell.textContent === '') {
+                    availableCells.push(index);
+                }
+            });
+
+            const randomIndex = availableCells[Math.floor(Math.random() * availableCells.length)];
+            cells[randomIndex].textContent = 'O';
+
+            if (checkWin('O')) {
+                setTimeout(() => alert('O wins!'), 100);
+                resetBoard();
+            } else if (isDraw()) {
+                setTimeout(() => alert('Draw!'), 100);
+                resetBoard();
+            } else {
+                currentPlayer = 'X';
+            }
+        }
+
+        function checkWin(player) {
+            return winningCombinations.some(combination => {
+                return combination.every(index => {
+                    return cells[index].textContent === player;
+                });
+            });
+        }
+
+        function isDraw() {
+            return Array.from(cells).every(cell => {
+                return cell.textContent !== '';
+            });
+        }
+
+        function resetBoard() {
+            cells.forEach(cell => {
+                cell.textContent = '';
+            });
+            currentPlayer = 'X';
+        }
+    </script>
+</body>
+</html>
